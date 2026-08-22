@@ -1,0 +1,18 @@
+# Web Framework & Server
+fastapi>=0.110.0,<0.112.0
+uvicorn[standard]>=0.28.0,<0.30.0
+
+# Database & ORM
+sqlalchemy>=2.0.0,<2.1.0
+psycopg[binary]>=3.1.0,<4.0.0
+alembic>=1.13.0,<1.14.0
+
+# Data Validation & Settings
+pydantic>=2.6.0,<3.0.0
+pydantic-settings>=2.2.0,<3.0.0
+email-validator>=2.1.0,<3.0.0
+
+# Testing & Utilities
+pytest>=8.0.0,<9.0.0
+httpx>=0.27.0,<0.28.0
+python-dotenv>=1.0.1,<2.0.0

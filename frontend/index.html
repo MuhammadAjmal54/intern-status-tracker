@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Intern Status Tracker</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <div class="header-inner">
+            <h1>🎯 Intern Status Tracker</h1>
+            <nav class="tab-nav">
+                <button class="tab-btn active" onclick="showTab('tab-dashboard')">Dashboard</button>
+                <button class="tab-btn" onclick="showTab('tab-candidates')">Candidates</button>
+                <button class="tab-btn" onclick="showTab('tab-status')">Daily Status</button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Global Alert Banner -->
+        <div id="alert-banner" class="alert hidden"></div>
+
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- TAB: Dashboard                                      -->
+        <!-- ═══════════════════════════════════════════════════ -->
+        <section id="tab-dashboard" class="tab-panel active">
+            <div class="section-header">
+                <h2>Dashboard</h2>
+                <div class="filter-row">
+                    <label for="dashboard-date">Date:</label>
+                    <input type="date" id="dashboard-date">
+                    <button onclick="loadDashboard()">Refresh</button>
+                </div>
+            </div>
+
+            <!-- Metrics Grid -->
+            <div class="metrics-grid" id="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-value" id="metric-active"><span class="spinner-sm"></span></div>
+                    <div class="metric-label">Active Candidates</div>
+                </div>
+                <div class="metric-card success">
+                    <div class="metric-value" id="metric-submitted"><span class="spinner-sm"></span></div>
+                    <div class="metric-label">Submitted Today</div>
+                </div>
+                <div class="metric-card warning">
+                    <div class="metric-value" id="metric-missing"><span class="spinner-sm"></span></div>
+                    <div class="metric-label">Missing Today</div>
+                </div>
+                <div class="metric-card info">
+                    <div class="metric-value" id="metric-avg"><span class="spinner-sm"></span></div>
+                    <div class="metric-label">Avg Completion</div>
+                </div>
+            </div>
+
+            <div class="dashboard-columns">
+                <!-- Submitted Candidates -->
+                <div class="dash-col">
+                    <h3 class="section-title submitted-title">✅ Submitted</h3>
+                    <div id="submitted-list" class="candidate-card-list">
+                        <div class="loading-placeholder"><span class="spinner-sm"></span> Loading…</div>
+                    </div>
+                </div>
+
+                <!-- Missing Candidates -->
+                <div class="dash-col">
+                    <h3 class="section-title missing-title">⚠️ Not Submitted</h3>
+                    <div id="missing-list" class="candidate-card-list missing-bg">
+                        <div class="loading-placeholder"><span class="spinner-sm"></span> Loading…</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- TAB: Candidates                                     -->
+        <!-- ═══════════════════════════════════════════════════ -->
+        <section id="tab-candidates" class="tab-panel hidden">
+            <div class="section-header">
+                <h2>Candidate Management</h2>
+            </div>
+
+            <!-- Add / Edit Form -->
+            <div class="card">
+                <h3 id="cand-form-title">Add New Candidate</h3>
+                <form id="candidate-form" onsubmit="handleCandidateSubmit(event)">
+                    <input type="hidden" id="candidate-id">
+                    <div class="form-grid-2">
+                        <div class="form-field">
+                            <label for="cand-name">Full Name <span class="required">*</span></label>
+                            <input type="text" id="cand-name" placeholder="e.g. Ali Hassan" required>
+                        </div>
+                        <div class="form-field">
+                            <label for="cand-email">Email <span class="required">*</span></label>
+                            <input type="email" id="cand-email" placeholder="ali@example.com" required>
+                        </div>
+                        <div class="form-field">
+                            <label for="cand-track">Training Track <span class="required">*</span></label>
+                            <input type="text" id="cand-track" placeholder="e.g. Python, React, Java" required>
+                        </div>
+                        <div class="form-field">
+                            <label>Status</label>
+                            <label class="toggle-label">
+                                <input type="checkbox" id="cand-active" checked>
+                                <span class="toggle-text">Active</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" id="cand-btn">Add Candidate</button>
+                        <button type="button" id="cand-cancel" class="btn-secondary hidden" onclick="resetCandidateForm()">Cancel</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Candidate Table -->
+            <div class="card">
+                <div class="section-header">
+                    <h3>All Candidates</h3>
+                    <div class="filter-row">
+                        <label for="filter-active">Show:</label>
+                        <select id="filter-active" onchange="loadCandidates()">
+                            <option value="">All</option>
+                            <option value="true">Active Only</option>
+                            <option value="false">Inactive Only</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="candidates-loading" class="loading-bar hidden"></div>
+                <div class="table-wrapper">
+                    <table id="candidates-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Track</th>
+                                <th>Status</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="candidates-list">
+                            <tr><td colspan="7" class="empty-row">Loading…</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══════════════════════════════════════════════════ -->
+        <!-- TAB: Daily Status                                   -->
+        <!-- ═══════════════════════════════════════════════════ -->
+        <section id="tab-status" class="tab-panel hidden">
+            <div class="section-header">
+                <h2>Daily Status</h2>
+            </div>
+
+            <!-- Submit / Edit Form -->
+            <div class="card">
+                <h3 id="status-form-title">Submit Daily Status</h3>
+                <form id="status-form" onsubmit="handleStatusSubmit(event)">
+                    <input type="hidden" id="status-id">
+                    <div class="form-grid-2">
+                        <div class="form-field">
+                            <label for="status-candidate">Candidate <span class="required">*</span></label>
+                            <select id="status-candidate" required>
+                                <option value="">-- Select Candidate --</option>
+                            </select>
+                        </div>
+                        <div class="form-field">
+                            <label for="status-date">Date <span class="required">*</span></label>
+                            <input type="date" id="status-date" required>
+                        </div>
+                        <div class="form-field">
+                            <label for="status-completion">Completion % (0–100) <span class="required">*</span></label>
+                            <input type="number" id="status-completion" min="0" max="100" placeholder="e.g. 75" required>
+                        </div>
+                    </div>
+                    <div class="form-grid-1">
+                        <div class="form-field">
+                            <label for="status-work">Work Completed <span class="required">*</span></label>
+                            <textarea id="status-work" rows="3" placeholder="Describe what you worked on today…" required></textarea>
+                        </div>
+                        <div class="form-field">
+                            <label for="status-topics">Topics Learned <span class="required">*</span></label>
+                            <textarea id="status-topics" rows="3" placeholder="What did you learn today…" required></textarea>
+                        </div>
+                        <div class="form-field">
+                            <label for="status-blockers">Blockers <span class="optional">(optional)</span></label>
+                            <textarea id="status-blockers" rows="2" placeholder="Any blockers or impediments…"></textarea>
+                        </div>
+                        <div class="form-field">
+                            <label for="status-plan">Next Day Plan <span class="required">*</span></label>
+                            <textarea id="status-plan" rows="3" placeholder="What will you work on tomorrow…" required></textarea>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" id="status-btn">Submit Status</button>
+                        <button type="button" id="status-cancel" class="btn-secondary hidden" onclick="resetStatusForm()">Cancel</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Status History -->
+            <div class="card">
+                <div class="section-header">
+                    <h3>Status History</h3>
+                </div>
+                <div class="filter-row" style="flex-wrap:wrap; gap:10px;">
+                    <div class="filter-field">
+                        <label for="filter-candidate">Candidate:</label>
+                        <select id="filter-candidate" onchange="loadStatuses()">
+                            <option value="">All Candidates</option>
+                        </select>
+                    </div>
+                    <div class="filter-field">
+                        <label for="filter-date-from">From:</label>
+                        <input type="date" id="filter-date-from" onchange="loadStatuses()">
+                    </div>
+                    <div class="filter-field">
+                        <label for="filter-date-to">To:</label>
+                        <input type="date" id="filter-date-to" onchange="loadStatuses()">
+                    </div>
+                    <button onclick="clearStatusFilters()">Clear Filters</button>
+                </div>
+                <div id="statuses-loading" class="loading-bar hidden"></div>
+                <div class="table-wrapper">
+                    <table id="statuses-table">
+                        <thead>
+                            <tr>
+                                <th>Candidate</th>
+                                <th>Date</th>
+                                <th>Work Completed</th>
+                                <th>Topics Learned</th>
+                                <th>Blockers</th>
+                                <th>Next Day Plan</th>
+                                <th>%</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="statuses-list">
+                            <tr><td colspan="8" class="empty-row">Loading…</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>
