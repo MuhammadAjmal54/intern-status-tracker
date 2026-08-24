@@ -406,3 +406,93 @@ td .btn-sm { margin-right: 4px; }
     .tab-btn { flex: 1; text-align: center; }
     .metrics-grid { grid-template-columns: 1fr 1fr; }
 }
+
+
+/* Statistics / pagination filters */
+
+.status-filter-row {
+    align-items: flex-end;
+}
+
+.status-filter-row .filter-field {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+}
+
+.status-filter-row .filter-field input,
+.status-filter-row .filter-field select {
+    max-width: 180px;
+}
+
+#candidate-skip,
+#candidate-limit,
+#status-skip,
+#status-limit {
+    width: 100px;
+}
+
+#filter-candidate-id {
+    width: 130px;
+}
+
+#filter-exact-date {
+    width: 160px;
+}
+
+@media (max-width: 700px) {
+    .status-filter-row .filter-field {
+        width: 100%;
+    }
+
+    .status-filter-row .filter-field input,
+    .status-filter-row .filter-field select {
+        max-width: none;
+        width: 100%;
+    }
+
+    #candidate-skip,
+    #candidate-limit,
+    #status-skip,
+    #status-limit,
+    #filter-candidate-id,
+    #filter-exact-date {
+        width: 100%;
+    }
+}
+
+
+
+/* Candidate filter actions */
+.candidate-filter-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Daily status filter actions */
+.status-filter-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    margin-left: 0;
+}
+
+.status-filter-actions button {
+    width: 100%;
+}
+
+@media (max-width: 700px) {
+    .candidate-filter-actions {
+        width: 100%;
+    }
+
+    .candidate-filter-actions button {
+        flex: 1;
+    }
+
+    .status-filter-actions {
+        width: 100%;
+    }
+}
